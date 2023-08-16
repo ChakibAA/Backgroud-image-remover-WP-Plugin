@@ -10,7 +10,7 @@
     License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 */
 
-
+// Load js & css files
 function my_enqueue_scripts()
 {
 
@@ -21,10 +21,13 @@ function my_enqueue_scripts()
 }
 add_action('admin_enqueue_scripts', 'my_enqueue_scripts');
 
+// Update attachments details
+add_filter('attachment_fields_to_edit', 'custom_attachment_button', 10, 2);
 
 function custom_attachment_button($form_fields, $post)
 {
 
+    // Add button generate
     $form_fields['remove-bg'] = array(
         'label' => 'Generate image without backgroud',
         'input' => 'html',
@@ -32,6 +35,7 @@ function custom_attachment_button($form_fields, $post)
 
     );
 
+    // Add spinner
     $form_fields['remove-bg-spinner'] = array(
         'input' => 'html',
         'html' => '<div id="customModal" class="custom-modal">
@@ -51,9 +55,7 @@ function custom_attachment_button($form_fields, $post)
     return $form_fields;
 }
 
-add_filter('attachment_fields_to_edit', 'custom_attachment_button', 10, 2);
-
-
+// Ajax function to call remover
 add_action('wp_ajax_execute_remover', 'execute_remover');
 add_action('wp_ajax_nopriv_execute_remover', 'execute_remover');
 
@@ -67,11 +69,13 @@ function execute_remover()
     // Get the id of image 
     $attachment_id = attachment_url_to_postid($attachment_url);
 
-
+    // Get the data of image
     $attachment = get_post($attachment_id);
 
+    // Python url
     $python_utl = 'http://127.0.0.1:5000';
 
+    // Call api url
     $api_url = $python_utl . '/remove_background?image_url=' . $attachment_url;
 
     $response = wp_remote_get($api_url);
@@ -94,6 +98,7 @@ function execute_remover()
             'post_content' => $attachment->post_content,
             'post_status' => 'inherit'
         );
+
         $attach_id = wp_insert_attachment($attachment, $image_path);
 
         // Generate metadata and update the attachment
@@ -107,24 +112,3 @@ function execute_remover()
 
     wp_die();
 }
-
-
-function custom_spinner_plugin_modal()
-{
-    ob_start();
-    ?>
-
-
-    <!-- Modal -->
-    <div id="customModal" class="custom-modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="modalMessage">Please wait while loading...</p>
-            <div class="spinner"></div>
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-
-add_shortcode('custom_spinner', 'custom_spinner_plugin_modal');

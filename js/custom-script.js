@@ -1,4 +1,3 @@
-
 function remove_bg() {
 
     jQuery('#customModal').fadeIn();
@@ -13,8 +12,6 @@ function remove_bg() {
     jQuery('.close').click(function () {
         jQuery('#customModal').fadeOut();
     });
-
-
 
     attachment_url = jQuery('img[class="details-image"]').attr('src')
 
@@ -37,5 +34,3 @@ function remove_bg() {
         }
     });
 }
-
-
